@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Front End</h2>
+
+<div id="demo">
+<button type="button" onclick="loadMessage()">Show Message</button>
+</div>
+
+<script>
+function loadMessage() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("demo").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "http://127.0.0.1:5000", true);
+  xhttp.send();
+}
+</script>
+
+</body>
+</html>
