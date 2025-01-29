@@ -23,7 +23,7 @@ def request(flow: http.HTTPFlow) -> None:
     # Example: Add a custom header
     if "example.com" in flow.request.pretty_url:
         flow.request.headers["Custom-Header"] = "ModifiedValue"
-        print(f"Modified request to {flow.request.pretty_url}")
+        log_message(f"Modified request to {flow.request.pretty_url}")
 
 # Log incoming responses
 def response(flow: http.HTTPFlow) -> None:
@@ -39,4 +39,4 @@ def response(flow: http.HTTPFlow) -> None:
     if "example.com" in flow.request.pretty_url:
         # Example: Replace a value in the response body
         flow.response.text = flow.response.text.replace("old_value", "new_value")
-        print(f"Modified response from {flow.request.pretty_url}")
+        log_message(f"Modified response from {flow.request.pretty_url}")
