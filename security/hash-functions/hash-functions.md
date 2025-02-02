@@ -7,7 +7,7 @@ A **hash function** is a mathematical function that converts an input (or 'messa
 - **Deterministic**: The same input always produces the same output.
 - **Fast Computation**: The function should return the hash in a reasonable time.
 - **Preimage Resistance**: Given a hash value, it should be computationally infeasible to retrieve the original input.
-- **Small Changes Result in Large Differences**: A tiny change in input should drastically change the output (avalanche effect).
+- **Small Changes Result in Large Differences**: A tiny change in input should drastically change the output (**avalanche effect**).
 - **Collision Resistance**: It should be hard to find two different inputs that produce the same hash.
 - **Irreversibility**: It should not be possible to derive the original input from the hash.
 
