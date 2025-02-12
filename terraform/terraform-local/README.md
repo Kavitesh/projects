@@ -95,4 +95,3 @@ This project is open-source under the **MIT License**.
 Happy automating with Terraform! 🚀
 ```
 
-This **README** provides setup instructions, usage, and cleanup steps. Let me know if you need modifications! 🚀
