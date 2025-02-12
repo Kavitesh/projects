@@ -93,5 +93,3 @@ rm hello.txt output.txt
 This project is open-source under the **MIT License**.
 
 Happy automating with Terraform! 🚀
-```
-
