@@ -1,6 +1,3 @@
-Here’s a **README.md** file for your Terraform local automation project:  
-
-```md
 # Terraform Local Automation Project
 
 This project demonstrates how to use **Terraform** to automate tasks on a **local machine**.  
