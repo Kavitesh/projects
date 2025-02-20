@@ -1,0 +1,5 @@
+replicaCount: 2
+image:
+  repository: your-dockerhub-username/hello-world
+  tag: latest
+  pullPolicy: Always
