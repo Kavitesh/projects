@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pipeline Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
+    <style>
+       body { 
+    text-align: center; 
+    font-family: "Arial", sans-serif; 
+    background: #f8f9fa; 
+}
+
+h1 { 
+    font-size: 32px; 
+    font-weight: bold; 
+    background: linear-gradient(to right, #007bff, #6610f2); 
+    -webkit-background-clip: text;
+    color: transparent;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    margin-bottom: 15px;
+}
+
+.controls {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 12px;
+    z-index: 100;
+    border-bottom: 2px solid #ddd;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px;
+    height: 75vh;
+    padding: 20px;
+    margin-bottom: 50px; /* Adds space at the bottom */
+}
+
+.chart-container { 
+    background: white; 
+    padding: 15px; 
+    border-radius: 10px; 
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1); 
+    transition: transform 0.2s ease-in-out;
+}
+
+.chart-container:hover {
+    transform: scale(1.02);
+}
+
+input, select, button { 
+    margin: 6px; 
+    padding: 10px; 
+    font-size: 14px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+}
+
+button { 
+    background: #007bff; 
+    color: white; 
+    cursor: pointer; 
+    transition: background 0.2s ease-in-out;
+}
+
+button:hover { 
+    background: #0056b3; 
+}
+
+    </style>
+</head>
+<body>
+    <h1>AI Pipeline Dashboard</h1>
+
+    <!-- Controls to send logs -->
+    <div class="controls">
+        <input type="text" id="customerName" placeholder="Customer Name">
+        <select id="featureSelect">
+            <option value="feature_1">Feature 1</option>
+            <option value="feature_2">Feature 2</option>
+            <option value="feature_3">Feature 3</option>
+            <option value="feature_4">Feature 4</option>
+            <option value="feature_5">Feature 5</option>
+            <option value="feature_6">Feature 6</option>
+        </select>
+        <input type="datetime-local" id="startTime">
+        <input type="datetime-local" id="endTime">
+        <button onclick="sendLog()">Send Log</button>
+        <button onclick="sendRandomLogs()">Send 50 Random Logs</button>
+        <button onclick="startUpdates()">Start AI Updates</button>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid-container">
+        <div class="chart-container"><canvas id="churnChart"></canvas></div>
+        <div class="chart-container"><canvas id="recommendChart"></canvas></div>
+        <div class="chart-container"><canvas id="groupingChart"></canvas></div>
+        <div class="chart-container"><canvas id="anomalyChart"></canvas></div>
+    </div>
+
+    <script>
+
+        
+function computeDuration(start, end) {
+            let startTime = new Date(start);
+            let endTime = new Date(end);
+            let duration = Math.max(0, (endTime - startTime) / 1000); // Convert to seconds
+            return duration;
+        }
+
+        function sendLog() {
+            let customer = document.getElementById("customerName").value;
+            let feature = document.getElementById("featureSelect").value;
+            let startTime = document.getElementById("startTime").value ||  new Date(Date.now() - 10000).toISOString();
+            let endTime = document.getElementById("endTime").value || new Date().toISOString();
+            let duration = computeDuration(startTime, endTime);
+
+            if (!customer || !startTime || !endTime) {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            fetch("/send_log", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ customer, feature, startTime, endTime, duration })
+            }).then(response => response.json()).then(data => console.log("Log sent:", data));
+        }
+
+        function sendRandomLogs() {
+            for (let i = 0; i < 50; i++) {
+                let customer = "User_" + Math.floor(Math.random() * 100);
+                let feature = "feature_" + (Math.floor(Math.random() * 6) + 1);
+                let startTime = new Date(Date.now() - Math.random() * 86400000).toISOString();
+                let endTime = new Date().toISOString();
+                let duration = computeDuration(startTime, endTime);
+
+                fetch("/send_log", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ customer, feature, startTime, endTime, duration })
+                }).then(response => response.json()).then(data => console.log("Random log sent:", data));
+            }
+        }
+        
+        let charts = {};
+        let updateInterval;
+
+        // Create Bar Chart (Churn & Anomaly)
+        function createBarChart(canvasId, label, dummyData) {
+            let ctx = document.getElementById(canvasId).getContext("2d");
+            return new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: Object.keys(dummyData),
+                    datasets: [{ label: label, data: Object.values(dummyData), backgroundColor: "blue" }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+            });
+        }
+
+        // Create Heatmap Chart (Feature Recommendations)
+        function createHeatmapChart(canvasId, dummyData) {
+            let ctx = document.getElementById(canvasId).getContext("2d");
+            return new Chart(ctx, {
+                type: "matrix",
+                data: {
+                    datasets: [{
+                        label: "Feature Recommendations",
+                        data: dummyData.map(d => ({ x: d.customer, y: d.feature, v: d.value })),
+                        backgroundColor: ctx => ctx.raw?.v > 50 ? "red" : "green",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: "category", labels: [...new Set(dummyData.map(d => d.customer))] },
+                        y: { type: "category", labels: [...new Set(dummyData.map(d => d.feature))] }
+                    }
+                }
+            });
+        }
+
+        // Create Scatter Chart (Feature Usage & Duration)
+        function createScatterChart(canvasId, dummyData) {
+            let ctx = document.getElementById(canvasId).getContext("2d");
+            return new Chart(ctx, {
+                type: "scatter",
+                data: {
+                    datasets: [{
+                        label: "Customer Feature Usage",
+                        data: dummyData.map(d => ({ x: d.featureUsage, y: d.totalDuration, label: d.customer })),
+                        backgroundColor: "blue",
+                        borderColor: "black",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.raw.label || "";
+                                    return `${label}: Features Used ${context.raw.x}, Duration ${context.raw.y} min`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: "Feature Usage (Count)" }, min: 0, max: 6 },
+                        y: { title: { display: true, text: "Total Usage Duration (min)" }, min: 0, max: 250 }
+                    }
+                }
+            });
+        }
+
+        // Update chart dynamically
+        function updateChart(chart, newData) {
+            chart.data.datasets[0].data = newData;
+            chart.update();
+        }
+
+        function updateHeatmapChart(chart, newData) {
+            let customers = [...new Set(newData?.map(d => d.customer))];
+            let features = [...new Set(newData?.map(d => d.feature))];
+
+            chart.data.datasets[0].data = newData?.map(d => ({ x: customers.indexOf(d.customer), y: features.indexOf(d.feature), v: d.value }));
+            chart.options.scales.x.labels = customers;
+            chart.options.scales.y.labels = features;
+            chart.update();
+        }
+
+        function updateScatterChart(chart, newData) {
+            chart.data.datasets[0].data = newData?.map(d => ({
+                x: d.featureUsage,
+                y: d.totalDuration,
+                label: d.customer
+            }));
+            chart.update();
+        }
+
+        // Fetch AI Pipeline Data
+        function fetchData() {
+            fetch("/get_data")
+                .then(response => response.json())
+                .then(data => {
+                    updateChart(charts["churn"], Object.entries(data.churn || {}).map(([key, value]) => ({ x: key, y: value })));
+                    updateHeatmapChart(charts["recommend"], data.recommend || []);
+                    updateScatterChart(charts["grouping"], data.grouping || []);
+                    updateChart(charts["anomaly"], Object.entries(data.anomaly || {}).map(([key, value]) => ({ x: key, y: value })));
+                });
+        }
+
+        // Start AI Updates
+        function startUpdates() {
+            if (!updateInterval) {
+                updateInterval = setInterval(fetchData, 5000);
+              //  alert("AI Updates Started!");
+            }
+        }
+
+        // Initial Charts with Dummy Data
+        document.addEventListener("DOMContentLoaded", () => {
+            let dummyChurn = { "User A": 30, "User B": 50, "User C": 80 };
+            let dummyAnomaly = { "User A": 10, "User B": 60, "User C": 90 };
+            let dummyHeatmap = [
+                { customer: "User A", feature: "Feature 1", value: 20 },
+                { customer: "User B", feature: "Feature 2", value: 50 },
+                { customer: "User C", feature: "Feature 3", value: 70 }
+            ];
+            let dummyScatter = [
+                { customer: "User A", featureUsage: 2, totalDuration: 100 },
+                { customer: "User B", featureUsage: 5, totalDuration: 200 },
+                { customer: "User C", featureUsage: 1, totalDuration: 50 }
+            ];
+
+            charts["churn"] = createBarChart("churnChart", "Churn Probability", dummyChurn);
+            charts["recommend"] = createHeatmapChart("recommendChart", dummyHeatmap);
+            charts["grouping"] = createScatterChart("groupingChart", dummyScatter);
+            charts["anomaly"] = createBarChart("anomalyChart", "Anomaly Detection", dummyAnomaly);
+        });
+    </script>
+</body>
+</html>
