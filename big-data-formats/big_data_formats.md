@@ -71,28 +71,31 @@ Used for Time-series databases, financial data, IoT sensors.
 
 ## 7. Performance Benchmarks for Big Data Formats
 
- Format  Best Use Case  Query Speed 🚀  Compression 📦  Read Speed 📖  Write Speed ✍️  Schema Evolution 🔄 
--------------------------------------------------------------------------------------------------------------
- Parquet  OLAP, Data Warehouses  ✅ Fast (Columnar Indexing)  ✅ High (Dictionary Encoding)  ✅ Fast  ❌ Slower (Batch Writes)  ✅ Supports Evolution 
- ORC  Hive, Presto, Analytics  ✅ Very Fast  ✅ High  ✅ Fast  ❌ Slower  ✅ Supports Evolution 
- Arrow  In-Memory Processing  🚀 Very Fast (Zero-Copy)  ❌ Low  🚀 Instant (RAM)  ✅ Fast  ❌ Limited 
- Feather  Data Science (Pandas, R)  ✅ Fast  ❌ Low  ✅ Fast  ✅ Fast  ❌ Limited 
- Avro  Streaming, OLTP  ❌ Slower (Row-Based)  ✅ Medium  ❌ Slower  ✅ Fast  ✅ Strong (Backward & Forward) 
- Protobuf  APIs, Microservices  ✅ Fast (Binary)  ✅ High  ✅ Fast  ✅ Fast  ✅ Strong 
- JSON  APIs, NoSQL  ❌ Slow (Text-Based)  ❌ Low  ❌ Slow  ✅ Fast  ✅ Flexible 
- CSV  Simple ETL, Legacy Systems  ❌ Very Slow  ❌ None  ❌ Slow  ✅ Fast  ❌ None 
+| Format   | Best Use Case                | Query Speed 🚀                    | Compression 📦                | Read Speed 📖   | Write Speed ✍️         | Schema Evolution 🔄 |
+|----------|-----------------------------|----------------------------------|-------------------------------|----------------|------------------------|------------------|
+| Parquet  | OLAP, Data Warehouses       | ✅ Fast (Columnar Indexing)    | ✅ High (Dictionary Encoding) | ✅ Fast        | ❌ Slower (Batch Writes) | ✅ Supports Evolution |
+| ORC      | Hive, Presto, Analytics     | ✅ Very Fast                   | ✅ High                        | ✅ Fast        | ❌ Slower               | ✅ Supports Evolution |
+| Arrow    | In-Memory Processing        | 🚀 Very Fast (Zero-Copy)       | ❌ Low                         | 🚀 Instant (RAM) | ✅ Fast                 | ❌ Limited          |
+| Feather  | Data Science (Pandas, R)    | ✅ Fast                        | ❌ Low                         | ✅ Fast        | ✅ Fast                 | ❌ Limited          |
+| Avro     | Streaming, OLTP             | ❌ Slower (Row-Based)          | ✅ Medium                      | ❌ Slower      | ✅ Fast                 | ✅ Strong (Backward & Forward) |
+| Protobuf | APIs, Microservices         | ✅ Fast (Binary)               | ✅ High                        | ✅ Fast        | ✅ Fast                 | ✅ Strong          |
+| JSON     | APIs, NoSQL                 | ❌ Slow (Text-Based)           | ❌ Low                         | ❌ Slow        | ✅ Fast                 | ✅ Flexible        |
+| CSV      | Simple ETL, Legacy Systems  | ❌ Very Slow                   | ❌ None                        | ❌ Slow        | ✅ Fast                 | ❌ None            |
 
 ---
 
 ## 8. When to Use Each Format
- Use Case  Best Format 
-----------------------------
- Big Data Analytics (OLAP)  Parquet, ORC, Arrow, Delta Lake 
- Transactional Databases (OLTP)  Avro, Protobuf, JSON 
- Streaming & Log Data  Avro, Protobuf, JSON Lines 
- Graph Databases  GraphML, RDF, GraphSON 
- Geospatial Analytics  GeoJSON, Shapefile, KML 
- Time-Series Data  Parquet (time-indexed), InfluxDB, Apache Iceberg 
+
+| Use Case                      | Best Format                                    |
+|--------------------------------|-----------------------------------------------|
+| Big Data Analytics (OLAP)      | Parquet, ORC, Arrow, Delta Lake               |
+| Transactional Databases (OLTP) | Avro, Protobuf, JSON                          |
+| Streaming & Log Data          | Avro, Protobuf, JSON Lines                    |
+| Graph Databases               | GraphML, RDF, GraphSON                        |
+| Geospatial Analytics          | GeoJSON, Shapefile, KML                       |
+| Time-Series Data              | Parquet (time-indexed), InfluxDB, Apache Iceberg |
 
 ---
+
+
 
