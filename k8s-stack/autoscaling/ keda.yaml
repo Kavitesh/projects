@@ -1,0 +1,12 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: hello-world-keda
+spec:
+  scaleTargetRef:
+    name: hello-world
+  triggers:
+  - type: cpu
+    metadata:
+      type: Utilization
+      value: "50"
